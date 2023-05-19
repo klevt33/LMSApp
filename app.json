@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "LearnTTI",
+    "slug": "LearnTTI",
+    "version": "0.1.0",
+    "jsEngine": "hermes",
+    "orientation": [
+      "portrait",
+      "landscape"
+    ],
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.klevtov.LMSApp"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ff1c2d5a-2085-4b9d-b415-c19b96409924"
+      }
+    }
+  }
+}
