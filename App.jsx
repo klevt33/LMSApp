@@ -1,15 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  Button,
-  Image,
-  StatusBar,
-  SafeAreaView,
-  Dimensions,
-} from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, Text, View, TextInput, Button, Image, StatusBar, SafeAreaView, Dimensions } from "react-native";
 import { WebView } from "react-native-webview";
 import * as SecureStore from "expo-secure-store";
 
@@ -28,7 +18,7 @@ export default function App() {
     const encodedLoginName = encodeURIComponent(login);
     const encodedPassword = encodeURIComponent(pass);
     const url = `${baseUrl}Portal/LoginCheck.aspx?loginname=${encodedLoginName}&password=${encodedPassword}`;
-    save && saveCredentials(login, pass);
+    if (save) saveCredentials(login, pass);
     setLoggedOut(false);
     setWebViewUrl(url);
     setShowWebView(true);
@@ -41,14 +31,14 @@ export default function App() {
   };
 
   const handleHome = () => {
-    let homeUrl = baseUrl + "lms";
-    webViewUrl === homeUrl && (homeUrl += "/");
+    let homeUrl = `${baseUrl}lms`;
+    if (webViewUrl === homeUrl) homeUrl += "/";
     setWebViewUrl(homeUrl);
   };
 
   const handleLogout = () => {
     setLoggedOut(true);
-    setWebViewUrl(baseUrl + "logoutLocal.asp?CMDACTION=logoutSystem");
+    setWebViewUrl(`${baseUrl}logoutLocal.asp?CMDACTION=logoutSystem`);
   };
 
   const handleProfile = () => {
@@ -57,26 +47,16 @@ export default function App() {
   };
 
   const getOrientation = () => {
-    setPortrait(
-      Dimensions.get("window").width < Dimensions.get("window").height
-    );
+    setPortrait(Dimensions.get("window").width < Dimensions.get("window").height);
   };
 
-  useEffect(() => {
+  if (firstRun) {
+    setFirstRun(false);
     Dimensions.addEventListener("change", getOrientation);
-    return () => {
-      Dimensions.removeEventListener("change", getOrientation);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (firstRun) {
-      setFirstRun(false);
-      retrieveCredentials().then(([savedLogin, savedPass]) => {
-        savedLogin && savedPass && doLogin(savedLogin, savedPass, false);
-      });
-    }
-  }, [firstRun]);
+    retrieveCredentials().then(([savedLogin, savedPass]) => {
+      if (savedLogin && savedPass) doLogin(savedLogin, savedPass, false);
+    });
+  }
 
   return (
     <SafeAreaView style={styles.topContainer}>
@@ -85,11 +65,7 @@ export default function App() {
           {portrait && (
             <View style={styles.navBar}>
               <Button title="Home" onPress={handleHome} disabled={loggedOut} />
-              <Button
-                title="Logout"
-                onPress={handleLogout}
-                disabled={loggedOut}
-              />
+              <Button title="Logout" onPress={handleLogout} disabled={loggedOut} />
               <Button title="Login" onPress={handleProfile} />
             </View>
           )}
@@ -98,9 +74,7 @@ export default function App() {
       ) : (
         <View style={styles.container}>
           <Image source={require("./img/infor-logo.png")} style={styles.logo} />
-          <Text style={styles.title}>
-            Welcome to the Infor LMS App for TTI!
-          </Text>
+          <Text style={styles.title}>Welcome to the Infor LMS App for TTI!</Text>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Login Name:</Text>
@@ -143,15 +117,7 @@ async function saveCredentials(login, pass) {
 }
 
 function retrieveCredentials() {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const login = await SecureStore.getItemAsync("login");
-      const pass = await SecureStore.getItemAsync("pass");
-      resolve([login, pass]);
-    } catch (error) {
-      reject(error);
-    }
-  });
+  return Promise.all([SecureStore.getItemAsync("login"), SecureStore.getItemAsync("pass")]);
 }
 
 const styles = StyleSheet.create({
